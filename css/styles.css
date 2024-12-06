@@ -1,0 +1,27 @@
+.mainTable {
+  border: 5px;
+  margin: auto;
+}
+
+.display-panel {
+  font-size: 2.5rem;
+  text-align: right;
+  margin-bottom: 2rem;
+}
+
+.button {
+  font-size: 1.5rem;
+  height: 4.5rem;
+}
+
+.historyContent {
+  color: brown;
+  font-family: cursive;
+  font-size: 1.5rem;
+  white-space: nowrap;
+  overflow-x: auto;  
+  overflow-y: hidden; /* اسکرول نشدن در حالت عمودی */
+  width: 100%;        
+  max-height: 80px;   
+  padding: 5px;     
+}
