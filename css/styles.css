@@ -1,21 +1,35 @@
-table {
-  border-collapse: collapse;
-  margin: 20px auto;
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
 }
-td {
-  width: 3rem;
-  height: 3rem;
-  text-align: center;
-  border: 1px solid #280000;
+
+#sudoku-Table {
+  display: grid;
+  grid-template-columns: repeat(9, 50px);
+  gap: 1px;
+  border: 2px solid black;
+  background-color: black;
 }
-input {
+
+.cell {
+  width: 50px;
+  height: 50px;
+}
+
+.cell input {
   width: 100%;
   height: 100%;
   text-align: center;
-  font-size: 24px;
-  border: none;
 }
 
-.tborder {
-  border-top-width: 3px;
+.cell input:disabled {
+  background-color: #8dced6;
+  font-weight: bold;
+  color: black;
+}
+
+.bold-border {
+  border-width: 2px;
 }
