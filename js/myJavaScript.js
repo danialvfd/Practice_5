@@ -1,43 +1,46 @@
 const sudokuContainer = document.getElementById("sudoku-Table");
 class SudokuPuzzleCell {
-  constructor (rowIndex, columnIndex, value){
+  constructor(rowIndex, columnIndex, value) {
     this.rowIndex = rowIndex;
     this.columnIndex = columnIndex;
     this.value = value;
   }
 }
 
-async function loadSudokuFiles() {
-  try {
-    const [easyResponse, mediumResponse, hardResponse] = await Promise.all([
-      fetch("../assets/easy_game.txt"),
-      fetch("../data/middle_game.txt"),
-      fetch("../data/hard_game.txt"),
-    ]);
+function _addEventListener() {
+  let fileInput = document.getElementById('fileInput');
+  fileInput.addEventListener('change', function (event) {
+    const fileInput = event.target;
 
-    // تبدیل پاسخ‌ها به JSON
-    const easy = await easyResponse.json();
-    const medium = await mediumResponse.json();
-    const hard = await hardResponse.json();
+    if (fileInput.files.length === 0) {
+      console.log('No file selected.');
+      return;
+    }
 
-    // ذخیره در آرایه sudokuPuzzles
-    sudokuPuzzles = [easy, medium, hard];
-    console.log("Sudoku puzzles loaded successfully:", sudokuPuzzles);
-  } catch (error) {
-    console.error("Error loading sudoku puzzles:", error);
-  }
+    const file = fileInput.files[0];
+
+    if (file.type !== 'text/plain') {
+      console.error('Please select a valid text file.');
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+      const content = event.target.result; // Get the content of the file
+      loadSudoku(content);
+    };
+
+    reader.onerror = function (event) {
+      console.error("File could not be read! Code " + event.target.error.code);
+    };
+
+    reader.readAsText(file); // Read the file as text
+  });
 }
 
-
-
-// لود شدن جدول
-function loadSudoku(index) {
-  if (!sudokuPuzzles.length) {
-    alert("Sudoku puzzles not loaded yet! Please wait.");
-    return;
-  }
-
-  const initialSudoku = sudokuPuzzles[index - 1];
+function loadSudoku(content) {
+  let initialSudoku = JSON.parse(content);
   createSudokuGrid(initialSudoku);
 }
 
@@ -57,12 +60,20 @@ function createSudokuGrid(initialSudoku) {
       const input = document.createElement("input");
       input.maxLength = 1;
 
-      // مقدار پیش‌فرض
-      if (initialSudoku[row][col] !== null) {
-        input.value = initialSudoku[row][col];
-        input.disabled = true;
+      var isFound = false;
+      for (var i = 0; i < initialSudoku.length; i++) {
+        if (initialSudoku[i].columnIndex === col && initialSudoku[i].rowIndex === row) {
+          input.value = initialSudoku[i].value;
+          input.disabled = true;
+          isFound = true;
+          // PUSH TO ORGIN
+          break;
+        }
       }
 
+      if (!isFound) {
+        console.log("not found!");
+      }
       // بررسی ورودی
       input.addEventListener("input", (e) => {
         const value = e.target.value;
@@ -77,4 +88,4 @@ function createSudokuGrid(initialSudoku) {
   }
 }
 
-loadSudoku(1);
+_addEventListener();
