@@ -33,3 +33,9 @@ body {
 .bold-border {
   border-width: 2px;
 }
+
+.difficulty-table {
+  gap: 10px;
+  display: flex;
+  flex-direction: column;
+}

@@ -7,8 +7,36 @@ class SudokuPuzzleCell {
   }
 }
 
+async function loadSudokuFiles() {
+  try {
+    const [easyResponse, mediumResponse, hardResponse] = await Promise.all([
+      fetch("../assets/easy_game.txt"),
+      fetch("../data/middle_game.txt"),
+      fetch("../data/hard_game.txt"),
+    ]);
+
+    // تبدیل پاسخ‌ها به JSON
+    const easy = await easyResponse.json();
+    const medium = await mediumResponse.json();
+    const hard = await hardResponse.json();
+
+    // ذخیره در آرایه sudokuPuzzles
+    sudokuPuzzles = [easy, medium, hard];
+    console.log("Sudoku puzzles loaded successfully:", sudokuPuzzles);
+  } catch (error) {
+    console.error("Error loading sudoku puzzles:", error);
+  }
+}
+
+
+
 // لود شدن جدول
 function loadSudoku(index) {
+  if (!sudokuPuzzles.length) {
+    alert("Sudoku puzzles not loaded yet! Please wait.");
+    return;
+  }
+
   const initialSudoku = sudokuPuzzles[index - 1];
   createSudokuGrid(initialSudoku);
 }
@@ -49,4 +77,4 @@ function createSudokuGrid(initialSudoku) {
   }
 }
 
-// loadSudoku(1);
+loadSudoku(1);
