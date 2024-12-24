@@ -1,5 +1,6 @@
 const sudokuContainer = document.getElementById("sudoku-Table");
-const updatedSudoku = [];
+const cells = [];
+
 class SudokuPuzzleCell {
   constructor(rowIndex, columnIndex, value) {
     this.rowIndex = rowIndex;
@@ -9,19 +10,19 @@ class SudokuPuzzleCell {
 }
 
 function _addEventListener() {
-  let fileInput = document.getElementById('fileInput');
-  fileInput.addEventListener('change', function (event) {
+  let fileInput = document.getElementById("fileInput");
+  fileInput.addEventListener("change", function (event) {
     const fileInput = event.target;
 
     if (fileInput.files.length === 0) {
-      console.log('No file selected.');
+      console.log("No file selected.");
       return;
     }
 
     const file = fileInput.files[0];
 
-    if (file.type !== 'text/plain') {
-      console.error('Please select a valid text file.');
+    if (file.type !== "text/plain") {
+      console.error("Please select a valid text file.");
       return;
     }
 
@@ -48,9 +49,8 @@ function loadSudoku(content) {
 // ساخت جدول
 function _createSudokuGrid(initialSudoku) {
   sudokuContainer.innerHTML = "";
-  const cells = [];
   for (let row = 0; row < 9; row++) {
-    cells[row] = [];
+    cells[row] = []; // مقداردهی هر سطر
     for (let col = 0; col < 9; col++) {
       const cell = document.createElement("div");
       cell.classList.add("cell");
@@ -63,100 +63,124 @@ function _createSudokuGrid(initialSudoku) {
       const input = document.createElement("input");
       input.maxLength = 1;
 
-      var isFound = false;
-      for (var i = 0; i < initialSudoku.length; i++) {
-        if (initialSudoku[i].columnIndex === col && initialSudoku[i].rowIndex === row) {
-          input.value = initialSudoku[i].value;
+      let value = 0;
+      for (let i = 0; i < initialSudoku.length; i++) {
+        if (
+          initialSudoku[i].columnIndex === col &&
+          initialSudoku[i].rowIndex === row
+        ) {
+          value = initialSudoku[i].value;
+          input.value = value;
           input.disabled = true;
-          isFound = true;
-          updatedSudoku.push(new SudokuPuzzleCell(row, col, initialSudoku[i].value));
           break;
         }
       }
 
-      if (!isFound) {
-        updatedSudoku.push(new SudokuPuzzleCell(row, col, 0));
-      }
+      cells[row][col] = new SudokuPuzzleCell(row, col, 0);
+      cells[row][col].input = input;
 
-      cells[row][col] = { input, cell };
-      // بررسی ورودی
+      // رویداد برای ورودی کاربر
       input.addEventListener("input", (e) => {
-        const value = e.target.value;
-        if (!/^[1-9]$/.test(value)) {
+        const newValue = e.target.value;
+        if (!/^[1-9]$/.test(newValue)) {
           e.target.value = "";
+          cells[row][col].value = 0;
           return;
         }
-        const existingIndex = updatedSudoku.findIndex((cell) => cell.rowIndex === row && cell.columnIndex === col);
 
-        if (existingIndex !== -1) {
-          updatedSudoku[existingIndex].value = parseInt(value);
-        } else {
-          updatedSudoku.push(new SudokuPuzzleCell(row, col, parseInt(value)));
-        }
+        cells[row][col].value = parseInt(newValue);
+        console.log("Updated Cells:", cells);
 
-        console.log("Updated Sudoku:", updatedSudoku);
-
-        highlightDuplicates(row, col, value, cells);
-        CompletedSudoku(cells);
-        
+        _highlightDuplicates(row, col, newValue, cells);
       });
+
       cell.appendChild(input);
       sudokuContainer.appendChild(cell);
     }
   }
 }
 
-function highlightDuplicates(row, col, value, cells) {
+function _highlightDuplicates(row, col, newValue, cells) {
   let hasDuplicate = false;
 
-  // بازنشانی رنگ
   for (let r = 0; r < 9; r++) {
     for (let c = 0; c < 9; c++) {
       cells[r][c].input.style.border = "1px solid black";
     }
   }
 
-  // بررسی تکرار در سطر
-  for (let c = 0; c < 9; c++) {
-    if (c !== col && cells[row][c].input.value === value && value !== "") {
-      cells[row][c].input.style.border = "2px solid red"; 
-      hasDuplicate = true; 
-    }
-  }
-
-  // بررسی تکرار در ستون
+  // بررسی تکرار در کل جدول
   for (let r = 0; r < 9; r++) {
-    if (r !== row && cells[r][col].input.value === value && value !== "") {
-      cells[r][col].input.style.border = "2px solid red"; 
-      hasDuplicate = true; 
-    }
-  }
+    for (let c = 0; c < 9; c++) {
+      const currentValue = cells[r][c].input.value;
 
-  if (hasDuplicate) {
-    cells[row][col].input.style.border = "2px solid red";
-  }
-}      
+      if (currentValue === "") continue; // مشکل بررسی خانه های خالی که بررسی نکند
 
-function CompletedSudoku(cells) {
-  let allValid = true;
+      // بررسی تکرار در سطر
+      for (let k = 0; k < 9; k++) {
+        if (k !== c && cells[r][k].input.value === currentValue) {
+          cells[r][c].input.style.border = "2px solid red";
+          cells[r][k].input.style.border = "2px solid red";
+          hasDuplicate = true;
+        }
+      }
 
-  for (let row = 0; row < 9; row++) {
-    for (let col = 0; col < 9; col++) {
-      const value = cells[row][col].input.value;
-      if (value === "" || value === "0") {
-        allValid = false;
-        break;
+      // بررسی تکرار در ستون
+      for (let k = 0; k < 9; k++) {
+        if (k !== r && cells[k][c].input.value === currentValue) {
+          cells[r][c].input.style.border = "2px solid red";
+          cells[k][c].input.style.border = "2px solid red";
+          hasDuplicate = true;
+        }
+      }
+
+      // بررسی تکرار در زیرماتریس 3x3
+      const startRow = Math.floor(r / 3) * 3;
+      const startCol = Math.floor(c / 3) * 3;
+
+      for (let subRow = startRow; subRow < startRow + 3; subRow++) {
+        for (let subCol = startCol; subCol < startCol + 3; subCol++) {
+          if (
+            (subRow !== r || subCol !== c) &&
+            cells[subRow][subCol].input.value === currentValue
+          ) {
+            cells[r][c].input.style.border = "2px solid red";
+            cells[subRow][subCol].input.style.border = "2px solid red";
+            hasDuplicate = true;
+          }
+        }
       }
     }
   }
 
-  // صحیح شد
+  // بررسی تکمیل جدول 
+  if (!hasDuplicate) {
+    let allValid = true;
+
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        if (cells[r][c].input.value === "" || cells[r][c].input.value === "0") {
+          allValid = false;
+          break;
+        }
+      }
+      if (!allValid) break;
+    }
+
   if (allValid) {
-    sudokuContainer.style.border = "3px solid green";
-    alert("تبریک موفق شدید!!");
+      sudokuContainer.style.border = "3px solid green";
+      const feedbackMessage = document.getElementById("feedbackMessage");
+      feedbackMessage.textContent = "تبریک جدول کامل شد";
+    } else {
+      sudokuContainer.style.border = "2px solid black";
+      const feedbackMessage = document.getElementById("feedbackMessage");
+      feedbackMessage.textContent = "";
+    }
   } else {
-    sudokuContainer.style.border = "2px solid black"; 
+    sudokuContainer.style.border = "2px solid black";
+    const feedbackMessage = document.getElementById("feedbackMessage");
+    feedbackMessage.textContent = "";
   }
 }
 
-_addEventListener();      
+_addEventListener();
