@@ -1,14 +1,6 @@
 const sudokuContainer = document.getElementById("sudoku-Table");
 const cells = [];
 
-class SudokuPuzzleCell {
-  constructor(rowIndex, columnIndex, value) {
-    this.rowIndex = rowIndex;
-    this.columnIndex = columnIndex;
-    this.value = value;
-  }
-}
-
 function _addEventListener() {
   let fileInput = document.getElementById("fileInput");
   fileInput.addEventListener("change", function (event) {
@@ -63,23 +55,20 @@ function _createSudokuGrid(initialSudoku) {
       const input = document.createElement("input");
       input.maxLength = 1;
 
-      let value = 0;
       for (let i = 0; i < initialSudoku.length; i++) {
         if (
           initialSudoku[i].columnIndex === col &&
           initialSudoku[i].rowIndex === row
         ) {
-          value = initialSudoku[i].value;
-          input.value = value;
+          input.value = initialSudoku[i].value;
           input.disabled = true;
           break;
         }
       }
 
-      cells[row][col] = new SudokuPuzzleCell(row, col, 0);
-      cells[row][col].input = input;
+      cells[row][col] = input;
 
-      // رویداد برای ورودی کاربر
+      // ورودی کاربر
       input.addEventListener("input", (e) => {
         const newValue = e.target.value;
         if (!/^[1-9]$/.test(newValue)) {
@@ -91,7 +80,7 @@ function _createSudokuGrid(initialSudoku) {
         cells[row][col].value = parseInt(newValue);
         console.log("Updated Cells:", cells);
 
-        _highlightDuplicates(row, col, newValue, cells);
+        _highlightDuplicates(cells);
       });
 
       cell.appendChild(input);
@@ -100,36 +89,36 @@ function _createSudokuGrid(initialSudoku) {
   }
 }
 
-function _highlightDuplicates(row, col, newValue, cells) {
+function _highlightDuplicates(cells) {
   let hasDuplicate = false;
 
   for (let r = 0; r < 9; r++) {
     for (let c = 0; c < 9; c++) {
-      cells[r][c].input.style.border = "1px solid black";
+      cells[r][c].style.border = "1px solid black";
     }
   }
 
   // بررسی تکرار در کل جدول
   for (let r = 0; r < 9; r++) {
     for (let c = 0; c < 9; c++) {
-      const currentValue = cells[r][c].input.value;
+      const currentValue = cells[r][c].value;
 
       if (currentValue === "") continue; // مشکل بررسی خانه های خالی که بررسی نکند
 
       // بررسی تکرار در سطر
       for (let k = 0; k < 9; k++) {
-        if (k !== c && cells[r][k].input.value === currentValue) {
-          cells[r][c].input.style.border = "2px solid red";
-          cells[r][k].input.style.border = "2px solid red";
+        if (k !== c && cells[r][k].value === currentValue) {
+          cells[r][c].style.border = "2px solid red";
+          cells[r][k].style.border = "2px solid red";
           hasDuplicate = true;
         }
       }
 
       // بررسی تکرار در ستون
       for (let k = 0; k < 9; k++) {
-        if (k !== r && cells[k][c].input.value === currentValue) {
-          cells[r][c].input.style.border = "2px solid red";
-          cells[k][c].input.style.border = "2px solid red";
+        if (k !== r && cells[k][c].value === currentValue) {
+          cells[r][c].style.border = "2px solid red";
+          cells[k][c].style.border = "2px solid red";
           hasDuplicate = true;
         }
       }
@@ -142,10 +131,10 @@ function _highlightDuplicates(row, col, newValue, cells) {
         for (let subCol = startCol; subCol < startCol + 3; subCol++) {
           if (
             (subRow !== r || subCol !== c) &&
-            cells[subRow][subCol].input.value === currentValue
+            cells[subRow][subCol].value === currentValue
           ) {
-            cells[r][c].input.style.border = "2px solid red";
-            cells[subRow][subCol].input.style.border = "2px solid red";
+            cells[r][c].style.border = "2px solid red";
+            cells[subRow][subCol].style.border = "2px solid red";
             hasDuplicate = true;
           }
         }
@@ -159,7 +148,7 @@ function _highlightDuplicates(row, col, newValue, cells) {
 
     for (let r = 0; r < 9; r++) {
       for (let c = 0; c < 9; c++) {
-        if (cells[r][c].input.value === "" || cells[r][c].input.value === "0") {
+        if (cells[r][c].value === "") {
           allValid = false;
           break;
         }
@@ -167,7 +156,7 @@ function _highlightDuplicates(row, col, newValue, cells) {
       if (!allValid) break;
     }
 
-  if (allValid) {
+    if (allValid) {
       sudokuContainer.style.border = "3px solid green";
       const feedbackMessage = document.getElementById("feedbackMessage");
       feedbackMessage.textContent = "تبریک جدول کامل شد";

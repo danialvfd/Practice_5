@@ -46,6 +46,10 @@ const sudokuPuzzles = [
 const sudokuPuzzleReservedCells = [];
 
 
+
+
+
+
 ////old
 const sudokuContainer = document.getElementById("sudoku-Table");
 const updatedSudoku = [];

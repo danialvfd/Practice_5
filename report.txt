@@ -1,0 +1,5 @@
+function loadSudoku(content)        -10
+comments                               -100
+
+const cells = [];               -100
+refactor:                   -100
