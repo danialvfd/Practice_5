@@ -30,7 +30,7 @@ body {
   color: black;
 }
 
-.bold-border {
+.border-width-2px {
   border-width: 2px;
 }
 
@@ -42,4 +42,5 @@ body {
 
 .wrong-answer {
   background-color: red;
+  border: 2px solid red !important;
 }

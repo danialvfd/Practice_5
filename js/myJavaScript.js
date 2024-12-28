@@ -96,16 +96,17 @@ function _highlightDuplicates(cells) {
 
       for (let k = 0; k < 9; k++) {
         if (k !== c && cells[r][k].value === currentValue) {
-          cells[r][c].style.border = "2px solid red";
-          cells[r][k].style.border = "2px solid red";
+          cells[r][c].classList = "wrong-answer";
+          cells[r][k].classList = "wrong-answer";
+
           hasDuplicate = true;
         }
       }
 
       for (let k = 0; k < 9; k++) {
         if (k !== r && cells[k][c].value === currentValue) {
-          cells[r][c].style.border = "2px solid red";
-          cells[k][c].style.border = "2px solid red";
+          cells[r][c].classList = "wrong-answer";
+          cells[k][c].classList = "wrong-answer";
           hasDuplicate = true;
         }
       }
@@ -119,8 +120,8 @@ function _highlightDuplicates(cells) {
             (subRow !== r || subCol !== c) &&
             cells[subRow][subCol].value === currentValue
           ) {
-            cells[r][c].style.border = "2px solid red";
-            cells[subRow][subCol].style.border = "2px solid red";
+            cells[r][c].classList = "wrong-answer";
+            cells[subRow][subCol].classList = "wrong-answer";
             hasDuplicate = true;
           }
         }
@@ -134,6 +135,7 @@ function _resetCellStyles(cells) {
   for (let r = 0; r < 9; r++) {
     for (let c = 0; c < 9; c++) {
       cells[r][c].style.border = "1px solid black";
+      cells[r][c].classList = "";
     }
   }
 }

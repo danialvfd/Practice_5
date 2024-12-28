@@ -43,4 +43,15 @@ const sudokuPuzzles = [
     ],
 ];
 
-const sudokuPuzzleReservedCells = []; 
+const sudokuPuzzleReservedCells = [];
+
+for (let row = 0; row < 9; row++) {
+    for (let column = 0; column < 9; column++) {
+        let value = sudokuPuzzles[2][row][column];
+        if (value) {
+            sudokuPuzzleReservedCells.push(new SudokuPuzzleCell(row, column, value));
+        }
+    }
+}
+
+console.log(JSON.stringify(sudokuPuzzleReservedCells));
