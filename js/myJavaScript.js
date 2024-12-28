@@ -1,5 +1,5 @@
 const sudokuContainer = document.getElementById("sudoku-Table");
-const cells = [];
+const feedbackMessage = document.getElementById("feedbackMessage");
 
 function _addEventListener() {
   let fileInput = document.getElementById("fileInput");
@@ -21,28 +21,24 @@ function _addEventListener() {
     const reader = new FileReader();
 
     reader.onload = function (event) {
-      const content = event.target.result; // Get the content of the file
-      loadSudoku(content);
+      const content = event.target.result;
+      const initialSudoku = JSON.parse(content);
+      _createSudokuGrid(initialSudoku);
     };
 
     reader.onerror = function (event) {
-      console.error("File could not be read! Code " + event.target.error.code);
+      console.error("File could not be read! Code ");
     };
 
-    reader.readAsText(file); // Read the file as text
+    reader.readAsText(file);
   });
 }
 
-function loadSudoku(content) {
-  let initialSudoku = JSON.parse(content);
-  _createSudokuGrid(initialSudoku);
-}
-
-// ساخت جدول
 function _createSudokuGrid(initialSudoku) {
+  const cells = [];
   sudokuContainer.innerHTML = "";
   for (let row = 0; row < 9; row++) {
-    cells[row] = []; // مقداردهی هر سطر
+    cells[row] = [];
     for (let col = 0; col < 9; col++) {
       const cell = document.createElement("div");
       cell.classList.add("cell");
@@ -68,7 +64,6 @@ function _createSudokuGrid(initialSudoku) {
 
       cells[row][col] = input;
 
-      // ورودی کاربر
       input.addEventListener("input", (e) => {
         const newValue = e.target.value;
         if (!/^[1-9]$/.test(newValue)) {
@@ -91,21 +86,14 @@ function _createSudokuGrid(initialSudoku) {
 
 function _highlightDuplicates(cells) {
   let hasDuplicate = false;
+  _resetCellStyles(cells);
 
-  for (let r = 0; r < 9; r++) {
-    for (let c = 0; c < 9; c++) {
-      cells[r][c].style.border = "1px solid black";
-    }
-  }
-
-  // بررسی تکرار در کل جدول
   for (let r = 0; r < 9; r++) {
     for (let c = 0; c < 9; c++) {
       const currentValue = cells[r][c].value;
 
-      if (currentValue === "") continue; // مشکل بررسی خانه های خالی که بررسی نکند
+      if (currentValue === "") continue;
 
-      // بررسی تکرار در سطر
       for (let k = 0; k < 9; k++) {
         if (k !== c && cells[r][k].value === currentValue) {
           cells[r][c].style.border = "2px solid red";
@@ -114,7 +102,6 @@ function _highlightDuplicates(cells) {
         }
       }
 
-      // بررسی تکرار در ستون
       for (let k = 0; k < 9; k++) {
         if (k !== r && cells[k][c].value === currentValue) {
           cells[r][c].style.border = "2px solid red";
@@ -123,7 +110,6 @@ function _highlightDuplicates(cells) {
         }
       }
 
-      // بررسی تکرار در زیرماتریس 3x3
       const startRow = Math.floor(r / 3) * 3;
       const startCol = Math.floor(c / 3) * 3;
 
@@ -141,8 +127,19 @@ function _highlightDuplicates(cells) {
       }
     }
   }
+  _updateFeedbackMessage(cells, hasDuplicate)
+}
 
-  // بررسی تکمیل جدول 
+function _resetCellStyles(cells) {
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      cells[r][c].style.border = "1px solid black";
+    }
+  }
+}
+
+
+function _updateFeedbackMessage(cells, hasDuplicate) {
   if (!hasDuplicate) {
     let allValid = true;
 
@@ -158,16 +155,13 @@ function _highlightDuplicates(cells) {
 
     if (allValid) {
       sudokuContainer.style.border = "3px solid green";
-      const feedbackMessage = document.getElementById("feedbackMessage");
       feedbackMessage.textContent = "تبریک جدول کامل شد";
     } else {
       sudokuContainer.style.border = "2px solid black";
-      const feedbackMessage = document.getElementById("feedbackMessage");
       feedbackMessage.textContent = "";
     }
   } else {
     sudokuContainer.style.border = "2px solid black";
-    const feedbackMessage = document.getElementById("feedbackMessage");
     feedbackMessage.textContent = "";
   }
 }

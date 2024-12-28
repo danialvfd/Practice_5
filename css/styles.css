@@ -39,3 +39,7 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+.wrong-answer {
+  background-color: red;
+}
