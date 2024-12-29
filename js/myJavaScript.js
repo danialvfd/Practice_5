@@ -1,37 +1,48 @@
 const sudokuContainer = document.getElementById("sudoku-Table");
 const feedbackMessage = document.getElementById("feedbackMessage");
+var initialSudoku = "";
 
-function _addEventListener() {
-  let fileInput = document.getElementById("fileInput");
-  fileInput.addEventListener("change", function (event) {
-    const fileInput = event.target;
+const resetSoduku = document.getElementById("resetSoduku");
+resetSoduku.addEventListener('click', _resetSudokuData);
 
-    if (fileInput.files.length === 0) {
-      console.log("No file selected.");
-      return;
-    }
+function _resetSudokuData() {
+  if (initialSudoku) {
+    sudokuContainer.innerHTML = "";
+    _createSudokuGrid(initialSudoku);
+  }
+}
 
-    const file = fileInput.files[0];
+let fileInput = document.getElementById("fileInput");
+fileInput.addEventListener("change", e => _addEventListener(e));
 
-    if (file.type !== "text/plain") {
-      console.error("Please select a valid text file.");
-      return;
-    }
+function _addEventListener(event) {
+  const fileInput = event.target;
 
-    const reader = new FileReader();
+  if (fileInput.files.length === 0) {
+    console.log("No file selected.");
+    return;
+  }
 
-    reader.onload = function (event) {
-      const content = event.target.result;
-      const initialSudoku = JSON.parse(content);
-      _createSudokuGrid(initialSudoku);
-    };
+  const file = fileInput.files[0];
 
-    reader.onerror = function (event) {
-      console.error("File could not be read! Code ");
-    };
+  if (file.type !== "text/plain") {
+    console.error("Please select a valid text file.");
+    return;
+  }
 
-    reader.readAsText(file);
-  });
+  const reader = new FileReader();
+
+  reader.onload = function (event) {
+    const content = event.target.result;
+    initialSudoku = JSON.parse(content);
+    _createSudokuGrid(initialSudoku);
+  };
+
+  reader.onerror = function (event) {
+    console.error("File could not be read! Code ");
+  };
+
+  reader.readAsText(file);
 }
 
 function _createSudokuGrid(initialSudoku) {
@@ -73,8 +84,6 @@ function _createSudokuGrid(initialSudoku) {
         }
 
         cells[row][col].value = parseInt(newValue);
-        console.log("Updated Cells:", cells);
-
         _highlightDuplicates(cells);
       });
 
@@ -140,7 +149,6 @@ function _resetCellStyles(cells) {
   }
 }
 
-
 function _updateFeedbackMessage(cells, hasDuplicate) {
   if (!hasDuplicate) {
     let allValid = true;
@@ -167,5 +175,3 @@ function _updateFeedbackMessage(cells, hasDuplicate) {
     feedbackMessage.textContent = "";
   }
 }
-
-_addEventListener();
