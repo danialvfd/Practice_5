@@ -68,7 +68,7 @@ function _createSudokuGrid(initialSudoku) {
         const newValue = e.target.value;
         if (!/^[1-9]$/.test(newValue)) {
           e.target.value = "";
-          cells[row][col].value = 0;
+          cells[row][col].value = "";
           return;
         }
 
